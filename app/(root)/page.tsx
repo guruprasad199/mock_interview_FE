@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import InterviewCard from "@/components/InterviewCard";
+import LandingPage from "@/components/LandingPage";
 
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
@@ -13,7 +14,11 @@ import UploadResumeButton from "@/components/UploadResumeButton";
 
 async function Home() {
   const user = await getCurrentUser();
-  console.log("useruser", user)
+
+  // Show landing page if user is not authenticated
+  if (!user) {
+    return <LandingPage />;
+  }
 
   const [userInterviews, allInterview] = await Promise.all([
     getInterviewsByUserId(user?.id!),
@@ -23,8 +28,6 @@ async function Home() {
   const hasPastInterviews = userInterviews?.length! > 0;
   const hasUpcomingInterviews = allInterview?.length! > 0;
 
-
-  console.log("heeeeee", user)
   return (
     <>
       <section className="card-cta">

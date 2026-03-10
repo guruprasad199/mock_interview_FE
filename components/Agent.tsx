@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import { interviewer } from "@/constants";
 import { createFeedback } from "@/lib/actions/general.action";
+import { trackInterviewStart, trackInterviewComplete } from "@/lib/firebase-analytics";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -38,10 +39,18 @@ const Agent = ({
   useEffect(() => {
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
+      // Track interview start
+      if (interviewId) {
+        trackInterviewStart(type === "generate" ? "resume-screening" : "technical");
+      }
     };
 
     const onCallEnd = () => {
       setCallStatus(CallStatus.FINISHED);
+      // Track interview completion
+      if (interviewId) {
+        trackInterviewComplete(type === "generate" ? "resume-screening" : "technical");
+      }
     };
 
     const onMessage = (message: Message) => {

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { isAuthenticated } from "@/lib/actions/auth.action";
 import Navbar from "@/components/NavBar";
+import { AppSessionTracker } from "@/components/AppSessionTracker";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const isUserAuthenticated = true
@@ -12,6 +13,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
 
   return (
     <>
+      <AppSessionTracker />
       <Navbar />
       <div className="root-layout">
         {/* <nav>
