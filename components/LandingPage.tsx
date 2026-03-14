@@ -34,6 +34,7 @@ import UploadResumeButton from "./UploadResumeButton";
 const LandingPage = () => {
     const user = { id: "123" }
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [showFreeBubble, setShowFreeBubble] = useState(false);
 
     const testimonials = [
         {
@@ -93,6 +94,17 @@ const LandingPage = () => {
         trackLandingPageView();
     }, []);
 
+    // Show a temporary promotional bubble when the page opens.
+    useEffect(() => {
+        setShowFreeBubble(true);
+
+        const hideTimer = setTimeout(() => {
+            setShowFreeBubble(false);
+        }, 4500);
+
+        return () => clearTimeout(hideTimer);
+    }, []);
+
     const handlePrev = () => {
         setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
     };
@@ -112,8 +124,52 @@ const LandingPage = () => {
         };
         return colors[color] || colors.blue;
     };
+
+    const freeBubbles = [
+        {
+            id: 1,
+            position: "top-6 left-4 sm:left-10",
+            tone: "bg-emerald-400 text-gray-950 ring-emerald-200/80",
+            pulse: "bg-emerald-300/40"
+        },
+        {
+            id: 2,
+            position: "top-14 right-4 sm:right-10",
+            tone: "bg-cyan-400 text-gray-950 ring-cyan-200/80",
+            pulse: "bg-cyan-300/40"
+        },
+        {
+            id: 3,
+            position: "bottom-20 left-4 sm:left-14",
+            tone: "bg-lime-400 text-gray-950 ring-lime-200/80",
+            pulse: "bg-lime-300/40"
+        },
+        {
+            id: 4,
+            position: "bottom-14 right-4 sm:right-14",
+            tone: "bg-teal-400 text-gray-950 ring-teal-200/80",
+            pulse: "bg-teal-300/40"
+        },
+    ];
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+            {showFreeBubble && (
+                <div className="pointer-events-none fixed inset-0 z-40">
+                    {freeBubbles.map((bubble) => (
+                        <div
+                            key={bubble.id}
+                            className={`absolute ${bubble.position} animate-in fade-in zoom-in-95 duration-500`}
+                        >
+                            <div className={`relative flex h-16 w-16 items-center justify-center rounded-full text-xs font-extrabold tracking-wide sm:h-20 sm:w-20 sm:text-sm ${bubble.tone} shadow-xl ring-2`}>
+                                FREE
+                                <span className={`absolute -inset-1 -z-10 animate-ping rounded-full ${bubble.pulse}`} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
             {/* Navbar */}
             <section className="card-cta">
                 <div className="flex flex-col gap-6 max-w-lg">
