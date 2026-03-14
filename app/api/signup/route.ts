@@ -1,11 +1,12 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { db } from "@/firebase/admin";
+import { getAdminDb } from "@/firebase/admin";
 
 export async function POST(req: Request) {
   try {
     const { uid, name, email } = await req.json();
+    const db = getAdminDb();
 
     if (!uid || !email) {
       return NextResponse.json(

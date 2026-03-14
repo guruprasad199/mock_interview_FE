@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, db } from "@/firebase/admin";
+import { getAdminAuth, getAdminDb } from "@/firebase/admin";
 import { cookies } from "next/headers";
 
 /**
@@ -13,6 +13,7 @@ const SESSION_DURATION = 60 * 60 * 24 * 7;
  */
 export async function setSessionCookie(idToken: string) {
   const cookieStore = cookies();
+  const auth = getAdminAuth();
 
   const sessionCookie = await auth.createSessionCookie(idToken, {
     expiresIn: SESSION_DURATION * 1000,
@@ -32,6 +33,7 @@ export async function setSessionCookie(idToken: string) {
  */
 export async function signUp(params: SignUpParams) {
   const { uid, name, email } = params;
+  const db = getAdminDb();
 
   try {
     if (!uid || !email) {
@@ -76,6 +78,7 @@ export async function signUp(params: SignUpParams) {
  */
 export async function signIn(params: SignInParams) {
   const { email, idToken } = params;
+  const auth = getAdminAuth();
 
   try {
     if (!email || !idToken) {
@@ -120,6 +123,8 @@ export async function signOut() {
 export async function getCurrentUser(): Promise<User | null> {
   const cookieStore = cookies();
   const sessionCookie = cookieStore.get("session")?.value;
+  const auth = getAdminAuth();
+  const db = getAdminDb();
 
   if (!sessionCookie) return null;
 

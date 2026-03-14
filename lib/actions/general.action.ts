@@ -3,13 +3,14 @@
 import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 
-import { db } from "@/firebase/admin";
+import { getAdminDb } from "@/firebase/admin";
 import { feedbackSchema } from "@/constants";
 
 /* -------------------------------- CREATE FEEDBACK -------------------------------- */
 
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript, feedbackId } = params;
+  const db = getAdminDb();
 
   if (!interviewId || !userId || !transcript?.length) {
     console.error("createFeedback: Missing required params", params);
@@ -86,6 +87,8 @@ export async function getInterviewById(
     return null;
   }
 
+  const db = getAdminDb();
+
   const interview = await db.collection("interviews").doc(id).get();
   return interview.exists ? (interview.data() as Interview) : null;
 }
@@ -96,6 +99,7 @@ export async function getFeedbackByInterviewId(
   params: GetFeedbackByInterviewIdParams
 ): Promise<Feedback | null> {
   const { interviewId, userId } = params;
+  const db = getAdminDb();
 
   if (!interviewId || !userId) {
     console.error("getFeedbackByInterviewId: Missing params", params);
@@ -121,6 +125,7 @@ export async function getLatestInterviews(
   params: GetLatestInterviewsParams
 ): Promise<Interview[] | null> {
   const { userId, limit = 20 } = params;
+  const db = getAdminDb();
 
   if (!userId) {
     console.error("getLatestInterviews: userId is undefined");
@@ -151,6 +156,8 @@ export async function getInterviewsByUserId(
     console.error("getInterviewsByUserId: userId is undefined");
     return null;
   }
+
+  const db = getAdminDb();
 
   const interviews = await db
     .collection("interviews")
