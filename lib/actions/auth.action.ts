@@ -123,12 +123,13 @@ export async function signOut() {
 export async function getCurrentUser(): Promise<User | null> {
   const cookieStore = cookies();
   const sessionCookie = cookieStore.get("session")?.value;
-  const auth = getAdminAuth();
-  const db = getAdminDb();
 
   if (!sessionCookie) return null;
 
   try {
+    const auth = getAdminAuth();
+    const db = getAdminDb();
+
     // ❌ Removed revocation check (stable)
     const decodedClaims = await auth.verifySessionCookie(sessionCookie);
 

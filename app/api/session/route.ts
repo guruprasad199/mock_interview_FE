@@ -1,7 +1,7 @@
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { getAdminAuth } from "@/firebase/admin";
 
 // 7 days
 const SESSION_DURATION = 60 * 60 * 24 * 7;
@@ -9,6 +9,7 @@ const SESSION_DURATION = 60 * 60 * 24 * 7;
 export async function POST(req: Request) {
   try {
     const { idToken } = await req.json();
+    const { getAdminAuth } = await import("@/firebase/admin");
     const auth = getAdminAuth();
 
     if (!idToken) {
