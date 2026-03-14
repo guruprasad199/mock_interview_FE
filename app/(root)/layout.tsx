@@ -1,16 +1,10 @@
-import Link from "next/link";
-import Image from "next/image";
 import { ReactNode } from "react";
-import { redirect } from "next/navigation";
-
-import { isAuthenticated } from "@/lib/actions/auth.action";
 import Navbar from "@/components/NavBar";
 import { AppSessionTracker } from "@/components/AppSessionTracker";
 
-const Layout = async ({ children }: { children: ReactNode }) => {
-  const isUserAuthenticated = true
-  if (!isUserAuthenticated) redirect("/sign-in");
+export const dynamic = "force-dynamic";
 
+const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       <AppSessionTracker />
