@@ -14,6 +14,11 @@ const Navbar = () => {
     const router = useRouter();
 
     useEffect(() => {
+        if (!auth) {
+            setLoading(false);
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
             setUser(firebaseUser);
             setLoading(false);
@@ -30,6 +35,11 @@ const Navbar = () => {
     }, [router]);
 
     const handleLogout = async () => {
+        if (!auth) {
+            router.push("/sign-in");
+            return;
+        }
+
         await signOut(auth);
         router.push("/sign-in");
     };

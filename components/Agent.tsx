@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { vapi } from "@/lib/vapi.sdk";
+import { getVapi } from "@/lib/vapi.sdk";
 import { interviewer } from "@/constants";
 import { createFeedback } from "@/lib/actions/general.action";
 import { trackInterviewStart, trackInterviewComplete } from "@/lib/firebase-analytics";
@@ -36,7 +36,19 @@ const Agent = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [lastMessage, setLastMessage] = useState<string>("");
 
+  const getSafeVapi = () => {
+    try {
+      return getVapi();
+    } catch (error) {
+      console.error("Vapi configuration error", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
+    const vapi = getSafeVapi();
+    if (!vapi) return;
+
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
       // Track interview start
@@ -89,7 +101,7 @@ const Agent = ({
       vapi.off("speech-end", onSpeechEnd);
       vapi.off("error", onError);
     };
-  }, []);
+  }, [interviewId, type]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -124,11 +136,23 @@ const Agent = ({
   }, [messages, callStatus, feedbackId, interviewId, router, type, userId]);
 
   const handleCall = async () => {
+    const vapi = getSafeVapi();
+    if (!vapi) {
+      setCallStatus(CallStatus.INACTIVE);
+      return;
+    }
+
     try {
       setCallStatus(CallStatus.CONNECTING);
 
       if (type === "generate") {
-        await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
+        const workflowId = process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID;
+
+        if (!workflowId) {
+          throw new Error("Missing NEXT_PUBLIC_VAPI_WORKFLOW_ID");
+        }
+
+        await vapi.start(workflowId, {
           variableValues: { username: userName, userid: userId },
         });
       } else {
@@ -144,8 +168,12 @@ const Agent = ({
   };
 
   const handleDisconnect = () => {
+    const vapi = getSafeVapi();
     setCallStatus(CallStatus.FINISHED);
-    vapi.stop();
+
+    if (vapi) {
+      vapi.stop();
+    }
   };
 
   return (

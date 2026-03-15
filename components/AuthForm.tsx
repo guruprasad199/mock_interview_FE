@@ -73,6 +73,8 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
   // Handle user data storage for OAuth
   const storeUserData = async (user: any) => {
+    if (!db) return;
+
     try {
       const userDoc = await getDoc(doc(db, "users", user.uid));
 
@@ -93,6 +95,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
   // OAuth Login Functions
   const handleGoogleLogin = async () => {
+    if (!auth || !db) {
+      toast.error("Firebase client env vars are missing in this deployment.");
+      return;
+    }
+
     setSocialLoading("google");
     try {
       const provider = new GoogleAuthProvider();
@@ -110,6 +117,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
   };
 
   const handleGithubLogin = async () => {
+    if (!auth || !db) {
+      toast.error("Firebase client env vars are missing in this deployment.");
+      return;
+    }
+
     setSocialLoading("github");
     try {
       const provider = new GithubAuthProvider();
@@ -127,6 +139,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
   };
 
   const handleAppleLogin = async () => {
+    if (!auth || !db) {
+      toast.error("Firebase client env vars are missing in this deployment.");
+      return;
+    }
+
     setSocialLoading("apple");
     try {
       const provider = new OAuthProvider("apple.com");
@@ -146,6 +163,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
   };
 
   const handleMicrosoftLogin = async () => {
+    if (!auth || !db) {
+      toast.error("Firebase client env vars are missing in this deployment.");
+      return;
+    }
+
     setSocialLoading("microsoft");
     try {
       const provider = new OAuthProvider("microsoft.com");
@@ -165,6 +187,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
   };
 
   const onSubmit = async (data: SignUpValues | SignInValues) => {
+    if (!auth || !db) {
+      toast.error("Firebase client env vars are missing in this deployment.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       /* =========================
