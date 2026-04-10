@@ -25,7 +25,9 @@ function getRequiredEnv(
   const value = process.env[key];
 
   if (!value) {
-    throw new Error(`Missing Firebase Admin environment variable: ${key}`);
+    throw new Error(
+      `Missing Firebase Admin environment variable: ${key}. Add it to .env.local for local development and to Vercel Project Settings -> Environment Variables for deployed environments.`
+    );
   }
 
   return value;
@@ -41,6 +43,12 @@ function createFirebaseAdminServices(): FirebaseAdminServices {
     .replace(/,\s*$/, "")
     // Convert escaped newlines to real newlines
     .replace(/\\n/g, "\n");
+
+  if (!privateKey.includes("BEGIN PRIVATE KEY") || !privateKey.includes("END PRIVATE KEY")) {
+    throw new Error(
+      "FIREBASE_PRIVATE_KEY is malformed. Paste the full Firebase service account private key into Vercel exactly as provided, keeping the BEGIN/END PRIVATE KEY lines and escaped newline characters."
+    );
+  }
 
   const app =
     getApps().length > 0

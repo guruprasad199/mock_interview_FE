@@ -102,7 +102,7 @@ npm install
 
 **Set Up Environment Variables**
 
-Create a new file named `.env.local` in the root of your project and add the following content:
+Create a new file named `.env.local` in the root of your project by copying `.env.example`, then add your real credentials:
 
 ```env
 NEXT_PUBLIC_VAPI_WEB_TOKEN=
@@ -125,6 +125,13 @@ FIREBASE_PRIVATE_KEY=
 ```
 
 Replace the placeholder values with your actual **[Firebase](https://firebase.google.com/)**, **[Vapi](https://vapi.ai/?utm_source=youtube&utm_medium=video&utm_campaign=jsmastery_recruitingpractice&utm_content=paid_partner&utm_term=recruitingpractice)** credentials.
+
+If you deploy on Vercel, you must also add the same variables in Project Settings -> Environment Variables. Vercel does not use your local `.env.local` file.
+
+For Firebase Auth on deployed environments:
+
+- Add your Vercel domain to Firebase Auth -> Authorized domains.
+- Paste `FIREBASE_PRIVATE_KEY` as the full private key string, preserving the `BEGIN PRIVATE KEY` and `END PRIVATE KEY` lines with escaped `\n` newlines.
 
 **Running the Project**
 

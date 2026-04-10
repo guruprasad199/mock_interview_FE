@@ -3,6 +3,17 @@ import { getAnalytics, type Analytics } from "firebase/analytics";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
+const requiredFirebaseClientEnvKeys = [
+  "NEXT_PUBLIC_FIREBASE_API_KEY",
+  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+  "NEXT_PUBLIC_FIREBASE_APP_ID",
+] as const;
+
+const missingFirebaseClientEnvKeys = requiredFirebaseClientEnvKeys.filter(
+  (key) => !process.env[key]
+);
+
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -21,6 +32,14 @@ export const hasFirebaseClientConfig = Boolean(
   firebaseConfig.projectId &&
   firebaseConfig.appId
 );
+
+if (missingFirebaseClientEnvKeys.length > 0) {
+  console.error(
+    `Firebase client configuration is incomplete. Missing: ${missingFirebaseClientEnvKeys.join(
+      ", "
+    )}. Add these variables to .env.local for local development and to Vercel Project Settings -> Environment Variables for deployed environments.`
+  );
+}
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
