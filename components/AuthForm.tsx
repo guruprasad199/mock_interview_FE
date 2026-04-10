@@ -17,6 +17,7 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   OAuthProvider,
+  User,
 } from "firebase/auth";
 
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -62,6 +63,23 @@ const AuthForm = ({ type }: AuthFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
+  const syncServerSession = async (user: User) => {
+    const idToken = await user.getIdToken(true);
+
+    const response = await fetch("/api/session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ idToken }),
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      throw new Error(payload?.message || "Failed to create server session.");
+    }
+  };
+
   const form = useForm<SignUpValues | SignInValues>({
     resolver: zodResolver(isSignIn ? signInSchema : signUpSchema),
     defaultValues: {
@@ -105,6 +123,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       await storeUserData(result.user);
+      await syncServerSession(result.user);
       trackSignIn("google");
       toast.success("Signed in with Google!");
       router.push("/");
@@ -127,6 +146,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
       const provider = new GithubAuthProvider();
       const result = await signInWithPopup(auth, provider);
       await storeUserData(result.user);
+      await syncServerSession(result.user);
       trackSignIn("github");
       toast.success("Signed in with GitHub!");
       router.push("/");
@@ -151,6 +171,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
       provider.addScope("name");
       const result = await signInWithPopup(auth, provider);
       await storeUserData(result.user);
+      await syncServerSession(result.user);
       trackSignIn("apple");
       toast.success("Signed in with Apple!");
       router.push("/");
@@ -175,6 +196,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
       provider.addScope("profile");
       const result = await signInWithPopup(auth, provider);
       await storeUserData(result.user);
+      await syncServerSession(result.user);
       trackSignIn("microsoft");
       toast.success("Signed in with Microsoft!");
       router.push("/");
@@ -244,6 +266,8 @@ const AuthForm = ({ type }: AuthFormProps) => {
         toast.error("User record not found.");
         return;
       }
+
+      await syncServerSession(userCredential.user);
 
       trackSignIn("email");
       toast.success("Signed in successfully.");

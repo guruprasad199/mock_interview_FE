@@ -1,12 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { getVapi } from "@/lib/vapi.sdk";
-import { interviewer } from "@/constants";
 import { createFeedback } from "@/lib/actions/general.action";
 import { trackInterviewStart, trackInterviewComplete } from "@/lib/firebase-analytics";
 
@@ -22,6 +20,65 @@ interface SavedMessage {
   content: string;
 }
 
+type SpeechRecognitionEventLike = {
+  results: ArrayLike<{
+    isFinal: boolean;
+    0: {
+      transcript: string;
+    };
+    length: number;
+  }>;
+};
+
+type SpeechRecognitionErrorEventLike = {
+  error: string;
+};
+
+type BrowserSpeechRecognition = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  maxAlternatives: number;
+  onend: null | (() => void);
+  onerror: null | ((event: SpeechRecognitionErrorEventLike) => void);
+  onresult: null | ((event: SpeechRecognitionEventLike) => void);
+  start: () => void;
+  stop: () => void;
+};
+
+type BrowserSpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
+
+declare global {
+  interface Window {
+    SpeechRecognition?: BrowserSpeechRecognitionConstructor;
+    webkitSpeechRecognition?: BrowserSpeechRecognitionConstructor;
+  }
+}
+
+const defaultQuestions = [
+  "Tell me about yourself.",
+  "What is your strongest technical skill and why?",
+  "Describe a challenging project you worked on and how you solved key issues.",
+  "How do you approach debugging when a production issue appears?",
+  "Why are you a good fit for this role?",
+  "How do you prioritize tasks when multiple deadlines are close?",
+  "Tell me about a time you handled unclear requirements.",
+  "What trade-offs do you consider before choosing a technical approach?",
+  "How do you ensure quality before shipping a feature?",
+  "What would you improve in your last project if you had one more sprint?",
+];
+
+function shuffleList<T>(items: T[]) {
+  const copy = [...items];
+
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
+  }
+
+  return copy;
+}
+
 const Agent = ({
   userName,
   userId,
@@ -34,146 +91,282 @@ const Agent = ({
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const [lastMessage, setLastMessage] = useState<string>("");
+  const [manualAnswer, setManualAnswer] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isGeneratingFeedback, setIsGeneratingFeedback] = useState(false);
+  const [completionMessage, setCompletionMessage] = useState("");
 
-  const getSafeVapi = () => {
-    try {
-      return getVapi();
-    } catch (error) {
-      console.error("Vapi configuration error", error);
-      return null;
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
+  const transcriptRef = useRef<SavedMessage[]>([]);
+  const currentQuestionRef = useRef(0);
+  const isAwaitingAnswerRef = useRef(false);
+  const activeQuestionsRef = useRef<string[]>([]);
+
+  const baseQuestions = useMemo(
+    () => (questions && questions.length > 0 ? questions : defaultQuestions.slice(0, 5)),
+    [questions]
+  );
+
+  const interviewQuestions =
+    activeQuestionsRef.current.length > 0
+      ? activeQuestionsRef.current
+      : baseQuestions;
+
+  const appendMessage = (message: SavedMessage) => {
+    transcriptRef.current = [...transcriptRef.current, message];
+    setMessages(transcriptRef.current);
+    setLastMessage(message.content);
+  };
+
+  const stopListening = () => {
+    setIsListening(false);
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // no-op
+      }
     }
   };
 
-  useEffect(() => {
-    const vapi = getSafeVapi();
-    if (!vapi) return;
-
-    const onCallStart = () => {
-      setCallStatus(CallStatus.ACTIVE);
-      // Track interview start
-      if (interviewId) {
-        trackInterviewStart(type === "generate" ? "resume-screening" : "technical");
-      }
-    };
-
-    const onCallEnd = () => {
-      setCallStatus(CallStatus.FINISHED);
-      // Track interview completion
-      if (interviewId) {
-        trackInterviewComplete(type === "generate" ? "resume-screening" : "technical");
-      }
-    };
-
-    const onMessage = (message: Message) => {
-      if (message.type === "transcript" && message.transcriptType === "final") {
-        const newMessage = { role: message.role, content: message.transcript };
-        setMessages((prev) => [...prev, newMessage]);
-      }
-    };
-
-    const onSpeechStart = () => {
-      console.log("speech start");
-      setIsSpeaking(true);
-    };
-
-    const onSpeechEnd = () => {
-      console.log("speech end");
-      setIsSpeaking(false);
-    };
-
-    const onError = (error: Error) => {
-      console.log("Error:", error);
-    };
-
-    vapi.on("call-start", onCallStart);
-    vapi.on("call-end", onCallEnd);
-    vapi.on("message", onMessage);
-    vapi.on("speech-start", onSpeechStart);
-    vapi.on("speech-end", onSpeechEnd);
-    vapi.on("error", onError);
-
-    return () => {
-      vapi.off("call-start", onCallStart);
-      vapi.off("call-end", onCallEnd);
-      vapi.off("message", onMessage);
-      vapi.off("speech-start", onSpeechStart);
-      vapi.off("speech-end", onSpeechEnd);
-      vapi.off("error", onError);
-    };
-  }, [interviewId, type]);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      setLastMessage(messages[messages.length - 1].content);
+  const speak = (text: string, onComplete?: () => void) => {
+    if (typeof window === "undefined") {
+      return;
     }
 
-    const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-      console.log("handleGenerateFeedback");
+    window.speechSynthesis.cancel();
 
-      const { success, feedbackId: id } = await createFeedback({
-        interviewId: interviewId!,
-        userId: userId!,
-        transcript: messages,
-        feedbackId,
-      });
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      onComplete?.();
+    };
 
-      if (success && id) {
-        router.push(`/interview/${interviewId}/feedback`);
-      } else {
-        console.log("Error saving feedback");
-        router.push("/");
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const startListening = () => {
+    if (!isSpeechSupported || !recognitionRef.current || callStatus !== CallStatus.ACTIVE) {
+      return;
+    }
+
+    setErrorMessage("");
+    setIsListening(true);
+
+    try {
+      recognitionRef.current.start();
+    } catch {
+      setErrorMessage("Microphone is busy. You can type your answer below.");
+      setIsListening(false);
+    }
+  };
+
+  const finishInterview = () => {
+    isAwaitingAnswerRef.current = false;
+    stopListening();
+
+    if (typeof window !== "undefined") {
+      window.speechSynthesis.cancel();
+    }
+
+    setCompletionMessage(
+      type === "interview"
+        ? "Interview completed. Generating your feedback now..."
+        : "Interview completed. Wrapping up your session..."
+    );
+    setIsGeneratingFeedback(type === "interview");
+
+    setCallStatus(CallStatus.FINISHED);
+
+    if (interviewId) {
+      trackInterviewComplete(type === "generate" ? "resume-screening" : "technical");
+    }
+  };
+
+  const askQuestion = (questionIndex: number) => {
+    const question = interviewQuestions[questionIndex];
+
+    if (!question) {
+      finishInterview();
+      return;
+    }
+
+    currentQuestionRef.current = questionIndex;
+    setCurrentQuestionIndex(questionIndex);
+    isAwaitingAnswerRef.current = true;
+    setManualAnswer("");
+    setErrorMessage("");
+
+    appendMessage({ role: "assistant", content: question });
+
+    speak(question, () => {
+      if (isSpeechSupported) {
+        window.setTimeout(() => startListening(), 250);
       }
+    });
+  };
+
+  const submitAnswer = (answerText: string) => {
+    const normalized = answerText.trim();
+
+    if (!normalized || !isAwaitingAnswerRef.current) {
+      return;
+    }
+
+    isAwaitingAnswerRef.current = false;
+    stopListening();
+    setManualAnswer("");
+
+    appendMessage({ role: "user", content: normalized });
+
+    const nextQuestionIndex = currentQuestionRef.current + 1;
+
+    if (nextQuestionIndex < interviewQuestions.length) {
+      window.setTimeout(() => askQuestion(nextQuestionIndex), 500);
+      return;
+    }
+
+    finishInterview();
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const RecognitionConstructor =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!RecognitionConstructor) {
+      setIsSpeechSupported(false);
+      return;
+    }
+
+    setIsSpeechSupported(true);
+
+    const recognition = new RecognitionConstructor();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event) => {
+      const spokenAnswer = Array.from(event.results)
+        .filter((result) => result.isFinal)
+        .map((result) => result[0].transcript.trim())
+        .join(" ")
+        .trim();
+
+      if (!spokenAnswer) {
+        return;
+      }
+
+      submitAnswer(spokenAnswer);
+    };
+
+    recognition.onerror = (event) => {
+      if (event.error === "not-allowed") {
+        setErrorMessage("Microphone permission was blocked. You can continue with typed answers.");
+      } else {
+        setErrorMessage("I could not hear that. You can retry mic or type your answer.");
+      }
+
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+
+    return () => {
+      recognition.stop();
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleGenerateFeedback = async (messages: SavedMessage[]) => {
+      if (!interviewId) {
+        router.push("/");
+        return;
+      }
+
+      setCompletionMessage("Interview completed. Generating your feedback now...");
+      setIsGeneratingFeedback(true);
+
+      let success = false;
+
+      if (userId && messages.length > 0) {
+        const result = await createFeedback({
+          interviewId,
+          userId,
+          transcript: messages,
+          feedbackId,
+        });
+
+        success = Boolean(result.success);
+      }
+
+      setIsGeneratingFeedback(false);
+
+      if (success) {
+        setCompletionMessage("Feedback ready. Opening your report...");
+      } else {
+        setCompletionMessage("Interview completed. Opening feedback page...");
+      }
+
+      router.push(`/interview/${interviewId}/feedback`);
     };
 
     if (callStatus === CallStatus.FINISHED) {
       if (type === "generate") {
         router.push("/");
       } else {
-        handleGenerateFeedback(messages);
+        handleGenerateFeedback(transcriptRef.current);
       }
     }
-  }, [messages, callStatus, feedbackId, interviewId, router, type, userId]);
+  }, [callStatus, feedbackId, interviewId, router, type, userId]);
 
-  const handleCall = async () => {
-    const vapi = getSafeVapi();
-    if (!vapi) {
-      setCallStatus(CallStatus.INACTIVE);
-      return;
-    }
+  const handleCall = () => {
+    transcriptRef.current = [];
+    activeQuestionsRef.current = shuffleList(baseQuestions);
+    setMessages([]);
+    setLastMessage("");
+    setManualAnswer("");
+    setErrorMessage("");
+    setCurrentQuestionIndex(0);
+    setCompletionMessage("");
+    setIsGeneratingFeedback(false);
 
     try {
       setCallStatus(CallStatus.CONNECTING);
 
-      if (type === "generate") {
-        const workflowId = process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID;
-
-        if (!workflowId) {
-          throw new Error("Missing NEXT_PUBLIC_VAPI_WORKFLOW_ID");
-        }
-
-        await vapi.start(workflowId, {
-          variableValues: { username: userName, userid: userId },
-        });
-      } else {
-        const formattedQuestions = questions?.map(q => `- ${q}`).join("\n") || "";
-        await vapi.start(interviewer, {
-          variableValues: { questions: formattedQuestions },
-        });
+      if (interviewId) {
+        trackInterviewStart(type === "generate" ? "resume-screening" : "technical");
       }
+
+      setCallStatus(CallStatus.ACTIVE);
+      askQuestion(0);
     } catch (err) {
-      console.error("Vapi start failed", err);
+      console.error("Interview start failed", err);
+      setErrorMessage("Unable to start interview. Please try again.");
       setCallStatus(CallStatus.INACTIVE);
     }
   };
 
   const handleDisconnect = () => {
-    const vapi = getSafeVapi();
-    setCallStatus(CallStatus.FINISHED);
-
-    if (vapi) {
-      vapi.stop();
-    }
+    finishInterview();
   };
 
   return (
@@ -221,6 +414,65 @@ const Agent = ({
             >
               {lastMessage}
             </p>
+          </div>
+        </div>
+      )}
+
+      {callStatus === CallStatus.ACTIVE && (
+        <div className="transcript-border">
+          <div className="transcript flex-col gap-3 py-4 px-4 sm:px-5">
+            <p className="text-sm text-light-100/80">
+              Question {currentQuestionIndex + 1} of {interviewQuestions.length}
+            </p>
+
+            <div className="w-full flex gap-2 max-sm:flex-col">
+              <input
+                value={manualAnswer}
+                onChange={(event) => setManualAnswer(event.target.value)}
+                placeholder="Type your answer here"
+                className="flex-1 min-h-11 rounded-full border border-white/15 bg-dark-200 px-4 text-white placeholder:text-light-100/60 outline-none"
+              />
+
+              <button
+                onClick={() => submitAnswer(manualAnswer)}
+                className="btn-primary min-h-11"
+              >
+                Submit Answer
+              </button>
+
+              {isSpeechSupported && (
+                <button
+                  onClick={startListening}
+                  className="btn-secondary min-h-11"
+                  disabled={isListening}
+                >
+                  {isListening ? "Listening..." : "Retry Mic"}
+                </button>
+              )}
+            </div>
+
+            {errorMessage && (
+              <p className="text-destructive-100 text-sm">{errorMessage}</p>
+            )}
+
+            {!isSpeechSupported && (
+              <p className="text-light-100/80 text-sm">
+                Voice recognition is not available in this browser. Continue with typed answers.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {callStatus === CallStatus.FINISHED && completionMessage && (
+        <div className="transcript-border">
+          <div className="transcript flex-col gap-3 py-4 px-4 sm:px-5">
+            <p className="text-white text-base text-center">{completionMessage}</p>
+            {isGeneratingFeedback && (
+              <p className="text-light-100/80 text-sm text-center">
+                Please wait while we analyze your answers.
+              </p>
+            )}
           </div>
         </div>
       )}

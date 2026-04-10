@@ -10,10 +10,8 @@ type Props = {
 export default function UploadResumeButton({ isLoggedIn }: Props) {
     const router = useRouter();
 
-
-    console.log("isLoggedIn", isLoggedIn)
     const handleClick = () => {
-        router.push(isLoggedIn ? "/interview" : "/sign-in");
+        router.push(isLoggedIn ? "/interview?autostart=1" : "/sign-in");
     };
 
     return (
@@ -21,7 +19,7 @@ export default function UploadResumeButton({ isLoggedIn }: Props) {
             onClick={handleClick}
             className="btn-primary max-sm:w-full"
         >
-            Upload Resume
+            Schedule Interview
         </Button>
     );
 }

@@ -59,36 +59,51 @@ const Feedback = async ({ params }: RouteParams) => {
 
       <hr />
 
-      <p>{feedback?.finalAssessment}</p>
+      <p>
+        {feedback?.finalAssessment ||
+          "Feedback is not ready yet. Please check back in a moment or retake the interview."}
+      </p>
 
       {/* Interview Breakdown */}
       <div className="flex flex-col gap-4">
         <h2>Breakdown of the Interview:</h2>
-        {feedback?.categoryScores?.map((category, index) => (
-          <div key={index}>
-            <p className="font-bold">
-              {index + 1}. {category.name} ({category.score}/100)
-            </p>
-            <p>{category.comment}</p>
-          </div>
-        ))}
+        {feedback?.categoryScores?.length ? (
+          feedback.categoryScores.map((category, index) => (
+            <div key={index}>
+              <p className="font-bold">
+                {index + 1}. {category.name} ({category.score}/100)
+              </p>
+              <p>{category.comment}</p>
+            </div>
+          ))
+        ) : (
+          <p>Interview breakdown will appear here once feedback generation completes.</p>
+        )}
       </div>
 
       <div className="flex flex-col gap-3">
         <h3>Strengths</h3>
         <ul>
-          {feedback?.strengths?.map((strength, index) => (
-            <li key={index}>{strength}</li>
-          ))}
+          {feedback?.strengths?.length ? (
+            feedback.strengths.map((strength, index) => (
+              <li key={index}>{strength}</li>
+            ))
+          ) : (
+            <li>Feedback strengths are not available yet.</li>
+          )}
         </ul>
       </div>
 
       <div className="flex flex-col gap-3">
         <h3>Areas for Improvement</h3>
         <ul>
-          {feedback?.areasForImprovement?.map((area, index) => (
-            <li key={index}>{area}</li>
-          ))}
+          {feedback?.areasForImprovement?.length ? (
+            feedback.areasForImprovement.map((area, index) => (
+              <li key={index}>{area}</li>
+            ))
+          ) : (
+            <li>Areas for improvement will appear once feedback is generated.</li>
+          )}
         </ul>
       </div>
 

@@ -34,10 +34,13 @@ function getRequiredEnv(
 function createFirebaseAdminServices(): FirebaseAdminServices {
   const projectId = getRequiredEnv("FIREBASE_PROJECT_ID");
   const clientEmail = getRequiredEnv("FIREBASE_CLIENT_EMAIL");
-  const privateKey = getRequiredEnv("FIREBASE_PRIVATE_KEY").replace(
-    /\\n/g,
-    "\n"
-  );
+  const privateKey = getRequiredEnv("FIREBASE_PRIVATE_KEY")
+    // Strip any surrounding quotes left by env parsers
+    .replace(/^["']|["']$/g, "")
+    // Strip any trailing comma (artifact when key was pasted from a JSON file)
+    .replace(/,\s*$/, "")
+    // Convert escaped newlines to real newlines
+    .replace(/\\n/g, "\n");
 
   const app =
     getApps().length > 0

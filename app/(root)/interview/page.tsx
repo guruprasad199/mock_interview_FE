@@ -1,20 +1,26 @@
-import Agent from "@/components/Agent";
+import { redirect } from "next/navigation";
+
+import VoiceInterviewScheduler from "@/components/VoiceInterviewScheduler";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 
-const Page = async () => {
+type InterviewPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+const Page = async ({ searchParams }: InterviewPageProps) => {
   const user = await getCurrentUser();
+  const resolvedSearchParams = await searchParams;
 
-  console.log("user", user)
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   return (
-    <>
-      <h3>Interview generation</h3>
-
-      <Agent
-        userName={user?.name!}
-        userId={user?.id}
-        type="generate"
-      />
-    </>
+    <VoiceInterviewScheduler
+      autoStart={resolvedSearchParams.autostart === "1"}
+      userId={user.id}
+      userName={user.name}
+    />
   );
 };
 

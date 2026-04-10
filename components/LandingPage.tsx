@@ -126,30 +126,30 @@ const LandingPage = () => {
     };
 
     const freeBubbles = [
-        {
-            id: 1,
-            position: "top-6 left-4 sm:left-10",
-            tone: "bg-emerald-400 text-gray-950 ring-emerald-200/80",
-            pulse: "bg-emerald-300/40"
-        },
-        {
-            id: 2,
-            position: "top-14 right-4 sm:right-10",
-            tone: "bg-cyan-400 text-gray-950 ring-cyan-200/80",
-            pulse: "bg-cyan-300/40"
-        },
+        // {
+        //     id: 1,
+        //     position: "top-6 left-4 sm:left-10",
+        //     tone: "bg-emerald-400 text-gray-950 ring-emerald-200/80",
+        //     pulse: "bg-emerald-300/40"
+        // },
+        // {
+        //     id: 2,
+        //     position: "top-14 right-4 sm:right-10",
+        //     tone: "bg-cyan-400 text-gray-950 ring-cyan-200/80",
+        //     pulse: "bg-cyan-300/40"
+        // },
         {
             id: 3,
             position: "bottom-20 left-4 sm:left-14",
             tone: "bg-lime-400 text-gray-950 ring-lime-200/80",
             pulse: "bg-lime-300/40"
         },
-        {
-            id: 4,
-            position: "bottom-14 right-4 sm:right-14",
-            tone: "bg-teal-400 text-gray-950 ring-teal-200/80",
-            pulse: "bg-teal-300/40"
-        },
+        // {
+        //     id: 4,
+        //     position: "bottom-14 right-4 sm:right-14",
+        //     tone: "bg-teal-400 text-gray-950 ring-teal-200/80",
+        //     pulse: "bg-teal-300/40"
+        // },
     ];
 
     return (
@@ -597,7 +597,7 @@ const LandingPage = () => {
                         </div>
                         <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
                         <p className="text-gray-400 mb-6">Best for serious candidates</p>
-                        <div className="text-4xl font-bold text-white mb-8">$29<span className="text-lg text-gray-400">/month</span></div>
+                        <div className="text-4xl font-bold text-white mb-8">$0<span className="text-lg text-gray-400">/month</span></div>
 
                         <ul className="space-y-3 mb-8 flex-1">
                             <li className="flex gap-3 text-gray-300">
@@ -633,7 +633,7 @@ const LandingPage = () => {
                     <div className="p-8 bg-gray-900/50 border border-gray-800 rounded-xl flex flex-col">
                         <h3 className="text-2xl font-bold text-white mb-2">Premium</h3>
                         <p className="text-gray-400 mb-6">For maximum success</p>
-                        <div className="text-4xl font-bold text-white mb-8">$79<span className="text-lg text-gray-400">/month</span></div>
+                        <div className="text-4xl font-bold text-white mb-8">$0<span className="text-lg text-gray-400">/month</span></div>
 
                         <ul className="space-y-3 mb-8 flex-1">
                             <li className="flex gap-3 text-gray-300">

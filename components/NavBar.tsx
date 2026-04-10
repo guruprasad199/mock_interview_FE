@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -36,11 +37,13 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         if (!auth) {
+            await fetch("/api/session", { method: "DELETE" });
             router.push("/sign-in");
             return;
         }
 
         await signOut(auth);
+        await fetch("/api/session", { method: "DELETE" });
         router.push("/sign-in");
     };
 
@@ -62,10 +65,17 @@ const Navbar = () => {
                     {user ? (
                         <>
                             <button
-                                onClick={() => router.push("/interview")}
+                                onClick={() => router.push("/")}
                                 className="font-medium text-white hover:underline"
                             >
-                                Interviews
+                                Dashboard
+                            </button>
+
+                            <button
+                                onClick={() => router.push("/interview?autostart=1")}
+                                className="font-medium text-white hover:underline"
+                            >
+                                Schedule Interview
                             </button>
 
                             <Button variant="outline" onClick={handleLogout}>
@@ -74,6 +84,20 @@ const Navbar = () => {
                         </>
                     ) : (
                         <>
+                            <Link
+                                href="/#features"
+                                className="font-medium text-white hover:underline"
+                            >
+                                Features
+                            </Link>
+
+                            <Link
+                                href="/#pricing"
+                                className="font-medium text-white hover:underline"
+                            >
+                                Pricing
+                            </Link>
+
                             <Button
                                 variant="outline"
                                 onClick={() => router.push("/sign-in")}
