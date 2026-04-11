@@ -55,6 +55,7 @@ interface AgentProps {
   feedbackId?: string;
   type: "generate" | "interview";
   questions?: string[];
+  badgeLabel?: string;
 }
 
 interface RouteParams {

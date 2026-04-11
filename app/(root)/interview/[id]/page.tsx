@@ -34,17 +34,13 @@ const InterviewDetails = async ({ params }: RouteParams) => {
               alt="cover-image"
               width={40}
               height={40}
-              className="rounded-full object-cover size-[40px]"
+              className="rounded-full object-cover size-10"
             />
             <h3 className="capitalize">{interview.role} Interview</h3>
           </div>
 
           <DisplayTechIcons techStack={interview.techstack} />
         </div>
-
-        <p className="bg-dark-200 px-4 py-2 rounded-lg h-fit">
-          {interview.type}
-        </p>
       </div>
 
       <Agent
@@ -54,6 +50,7 @@ const InterviewDetails = async ({ params }: RouteParams) => {
         type="interview"
         questions={interview.questions}
         feedbackId={feedback?.id}
+        badgeLabel={interview.type}
       />
     </>
   );

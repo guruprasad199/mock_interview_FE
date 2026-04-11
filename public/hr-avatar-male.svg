@@ -1,0 +1,89 @@
+<svg width="720" height="900" viewBox="0 0 720 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="360" y1="60" x2="360" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1A2742"/>
+      <stop offset="1" stop-color="#0C1424"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(360 210) rotate(90) scale(330 250)">
+      <stop stop-color="#79E2F2" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#79E2F2" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skin" x1="360" y1="180" x2="360" y2="550" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8B38C"/>
+      <stop offset="1" stop-color="#B87852"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="360" y1="110" x2="360" y2="310" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B2B2A"/>
+      <stop offset="1" stop-color="#1B1515"/>
+    </linearGradient>
+    <linearGradient id="jacket" x1="186" y1="500" x2="534" y2="790" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#233E78"/>
+      <stop offset="1" stop-color="#152A57"/>
+    </linearGradient>
+    <linearGradient id="lapel" x1="360" y1="470" x2="360" y2="780" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B3F48"/>
+      <stop offset="1" stop-color="#181C24"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="360" y1="470" x2="360" y2="770" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E7EEF8"/>
+    </linearGradient>
+    <filter id="shadow" x="54" y="24" width="612" height="852" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="20"/>
+      <feGaussianBlur stdDeviation="24"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.02 0 0 0 0 0.05 0 0 0 0 0.12 0 0 0 0.35 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <rect x="102" y="42" width="516" height="756" rx="46" fill="url(#bg)"/>
+    <rect x="102" y="42" width="516" height="756" rx="46" fill="url(#glow)"/>
+
+    <path d="M186 760C208 608 278 536 360 536C442 536 512 608 534 760H186Z" fill="url(#jacket)"/>
+    <path d="M284 522H436V760H284V522Z" fill="url(#shirt)"/>
+    <path d="M226 560L304 630L266 760H186C194 672 207 615 226 560Z" fill="#1A2E5F"/>
+    <path d="M494 560L416 630L454 760H534C526 672 513 615 494 560Z" fill="#1A2E5F"/>
+
+    <path d="M276 520H444L405 760H315L276 520Z" fill="#223A6D"/>
+    <path d="M286 522C310 548 331 581 345 617H375C389 581 410 548 434 522L462 760H258L286 522Z" fill="url(#lapel)"/>
+    <path d="M320 525H400L382 760H338L320 525Z" fill="#18243C" fill-opacity="0.45"/>
+
+    <rect x="325" y="428" width="70" height="88" rx="28" fill="url(#skin)"/>
+    <ellipse cx="360" cy="298" rx="125" ry="150" fill="url(#skin)"/>
+
+    <path d="M236 286C236 160 300 106 364 106C438 106 486 166 486 276V302C454 270 419 248 375 241C335 234 285 246 236 286Z" fill="url(#hair)"/>
+    <path d="M244 242C270 162 339 126 415 138C447 143 472 160 492 189C465 185 435 189 406 196C349 209 296 222 244 242Z" fill="#4A3736" fill-opacity="0.88"/>
+    <path d="M262 190C300 145 355 128 424 143C404 132 379 125 352 126C317 127 286 148 262 190Z" fill="#5A4541" fill-opacity="0.8"/>
+
+    <path d="M248 284C254 222 290 182 336 173C305 194 279 224 248 284Z" fill="#201717" fill-opacity="0.42"/>
+    <path d="M476 276C462 233 436 201 401 181C431 184 459 206 476 276Z" fill="#201717" fill-opacity="0.28"/>
+
+    <path d="M282 274C300 266 322 266 340 274" stroke="#301E1D" stroke-width="9" stroke-linecap="round"/>
+    <path d="M380 274C398 266 420 266 438 274" stroke="#301E1D" stroke-width="9" stroke-linecap="round"/>
+
+    <ellipse cx="309" cy="320" rx="15" ry="17" fill="#241816"/>
+    <ellipse cx="411" cy="320" rx="15" ry="17" fill="#241816"/>
+    <circle cx="314" cy="315" r="3.2" fill="#F6FAFF"/>
+    <circle cx="416" cy="315" r="3.2" fill="#F6FAFF"/>
+
+    <path d="M360 340C351 372 350 398 359 422" stroke="#A86543" stroke-width="7" stroke-linecap="round"/>
+    <path d="M316 450C342 462 378 462 404 450" stroke="#9E524C" stroke-width="9" stroke-linecap="round"/>
+
+    <ellipse cx="248" cy="358" rx="20" ry="26" fill="#D7936E"/>
+    <ellipse cx="472" cy="358" rx="20" ry="26" fill="#D7936E"/>
+
+    <path d="M304 523L360 568L416 523" stroke="#F0E6E1" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g opacity="0.55">
+      <path d="M495 562L530 600" stroke="#6E788A" stroke-width="4" stroke-linecap="round"/>
+      <path d="M475 596L535 676" stroke="#6E788A" stroke-width="4" stroke-linecap="round"/>
+      <path d="M462 640L518 748" stroke="#6E788A" stroke-width="4" stroke-linecap="round"/>
+      <path d="M515 560L474 640" stroke="#6E788A" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

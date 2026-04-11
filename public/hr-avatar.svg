@@ -1,0 +1,74 @@
+<svg width="640" height="800" viewBox="0 0 640 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGlow" x1="320" y1="0" x2="320" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#243B63" stop-opacity="0.0"/>
+      <stop offset="1" stop-color="#0F172A" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="320" y1="170" x2="320" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6D1BE"/>
+      <stop offset="1" stop-color="#D89F85"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="320" y1="90" x2="320" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B2A24"/>
+      <stop offset="1" stop-color="#1F1614"/>
+    </linearGradient>
+    <linearGradient id="blazer" x1="170" y1="430" x2="470" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="320" y1="460" x2="320" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D7E3F3"/>
+    </linearGradient>
+    <linearGradient id="tie" x1="320" y1="470" x2="320" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#312E81"/>
+    </linearGradient>
+    <filter id="shadow" x="60" y="50" width="520" height="700" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="18"/>
+      <feGaussianBlur stdDeviation="22"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.03 0 0 0 0 0.07 0 0 0 0 0.14 0 0 0 0.35 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="70" width="460" height="660" rx="42" fill="url(#bgGlow)"/>
+
+    <path d="M154 688C173 560 234 500 320 500C406 500 467 560 486 688H154Z" fill="url(#blazer)"/>
+    <path d="M246 508H394V688H246V508Z" fill="url(#shirt)"/>
+    <path d="M320 505L356 560L320 688L284 560L320 505Z" fill="url(#tie)"/>
+    <path d="M213 516L276 575L241 688H154C166 611 187 557 213 516Z" fill="#162033"/>
+    <path d="M427 516L364 575L399 688H486C474 611 453 557 427 516Z" fill="#162033"/>
+
+    <rect x="286" y="386" width="68" height="88" rx="30" fill="url(#skin)"/>
+    <ellipse cx="320" cy="270" rx="124" ry="150" fill="url(#skin)"/>
+
+    <path d="M198 231C198 138 249 90 320 90C391 90 442 138 442 231V247C424 214 401 191 375 178C339 160 299 160 265 178C238 191 216 214 198 247V231Z" fill="url(#hair)"/>
+    <path d="M206 251C209 164 256 117 320 117C384 117 431 164 434 251C420 229 401 211 378 198C342 179 299 179 263 198C240 211 220 229 206 251Z" fill="#2A1F1C" fill-opacity="0.92"/>
+    <path d="M220 186C246 136 292 106 348 112C389 117 419 143 434 187C400 164 357 152 314 154C279 156 246 166 220 186Z" fill="#4A342D" fill-opacity="0.9"/>
+
+    <ellipse cx="265" cy="273" rx="14" ry="18" fill="#FFF7F2" fill-opacity="0.55"/>
+    <ellipse cx="375" cy="273" rx="14" ry="18" fill="#FFF7F2" fill-opacity="0.55"/>
+
+    <path d="M261 254C276 249 288 251 296 258" stroke="#35211C" stroke-width="8" stroke-linecap="round"/>
+    <path d="M344 258C352 251 364 249 379 254" stroke="#35211C" stroke-width="8" stroke-linecap="round"/>
+
+    <ellipse cx="278" cy="282" rx="10" ry="11" fill="#2B1B19"/>
+    <ellipse cx="362" cy="282" rx="10" ry="11" fill="#2B1B19"/>
+    <circle cx="281" cy="279" r="2.5" fill="#FFFFFF"/>
+    <circle cx="365" cy="279" r="2.5" fill="#FFFFFF"/>
+
+    <path d="M320 294C311 320 306 351 313 377" stroke="#BE8169" stroke-width="6" stroke-linecap="round"/>
+    <path d="M286 408C307 420 334 420 355 408" stroke="#B56169" stroke-width="8" stroke-linecap="round"/>
+
+    <ellipse cx="232" cy="326" rx="22" ry="29" fill="#E8B19A"/>
+    <ellipse cx="408" cy="326" rx="22" ry="29" fill="#E8B19A"/>
+
+    <path d="M286 463L320 497L354 463" stroke="#D8B8A7" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

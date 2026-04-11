@@ -9,6 +9,7 @@ import {
 } from "@/lib/actions/general.action";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/auth.action";
+import InterviewRecordingPanel from "@/components/InterviewRecordingPanel";
 
 const Feedback = async ({ params }: RouteParams) => {
   const { id } = await params;
@@ -106,6 +107,8 @@ const Feedback = async ({ params }: RouteParams) => {
           )}
         </ul>
       </div>
+
+      <InterviewRecordingPanel interviewId={id} />
 
       <div className="buttons">
         <Button className="btn-secondary flex-1">
